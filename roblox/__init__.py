@@ -9,9 +9,6 @@ from .exceptions import ProxyError
 
 
 class Roblox:
-    BROWSER_WIDTH = 520
-    BROWSER_HEIGHT = 569
-
     def __init__(self, proxy: Optional[str] = None, browser_location: Optional[tuple] = None):
         options = ChromiumOptions().auto_port()
         options.set_tmp_path(os.path.join(os.getcwd(), 'profiles'))
@@ -25,7 +22,7 @@ class Roblox:
         options.set_argument('--high-dpi-support', .75)
         
         self._page = ChromiumPage(addr_or_opts=options)
-        self._page.set.window.size(Roblox.BROWSER_WIDTH + 16, Roblox.BROWSER_HEIGHT - 7)
+        self._page.set.window.size(520 + 16, 569 - 7)
         self._page.set.window.location(*(browser_location if browser_location else (0, 0)))
 
     def signup(self, account: Optional[Account] = None, timeout: int = 30) -> Optional[Account]:

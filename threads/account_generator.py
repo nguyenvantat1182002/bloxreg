@@ -1,8 +1,6 @@
 import pyautogui
-import os
 
 from PyQt5.QtCore import QThread, QThreadPool, QRunnable
-from roblox import Roblox
 
 
 class AccountGeneratorThread(QThread):
@@ -42,5 +40,35 @@ class AccountGeneratorThread(QThread):
     def run(self):
         window_size = pyautogui.size()
         w_w, w_h = window_size.width, window_size.height
-        cols, rows = w_w // Roblox.BROWSER_HEIGHT, w_h // Roblox.BROWSER_WIDTH
-        print(cols, rows)
+        b_w, b_h = 392, 429
+        cols, rows = w_w // b_w, w_h // b_h
+        
+        for _ in range(self.threads):
+            x = y = 0
+            
+            for _ in range(rows):
+                for _ in range(cols):
+                    item = AccountGeneratorRunnable(self, (x, y))
+                    self._pool.start(item)
+
+                    x += b_w
+
+                    QThread.msleep(300)
+
+                x = 0
+                y += b_h
+
+        self._pool.waitForDone()
+
+
+class AccountGeneratorRunnable(QRunnable):
+    def __init__(self, parent: AccountGeneratorThread, browser_location: tuple):
+        super().__init__()
+
+        self._parent = parent
+        self._browser_location = browser_location
+
+    def run(self):
+        while not self._parent.stop:
+            pass
+
