@@ -1,7 +1,8 @@
 import os
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QMessageBox
+from threads import AccountGeneratorThread
 
 
 class MainWindow(QMainWindow):
@@ -12,14 +13,27 @@ class MainWindow(QMainWindow):
         self.pushButton.clicked.connect(self.pushButton_clicked)
         self.pushButton_2.clicked.connect(self.pushButton_2_clicked)
 
+        self._account_generator = None
+
     def pushButton_clicked(self):
         match self.pushButton.text():
             case 'Bắt đầu':
                 self.pushButton.setText('Dừng')
+
+                self._account_generator = AccountGeneratorThread()
+                self._account_generator.threads = self.spinBox.value()
+                self._account_generator.timeout = self.spinBox_2.value()
+                self._account_generator.finished.connect(self._task_finished)
+                self._account_generator.start()
             case 'Dừng':
-                self.pushButton.setText('Bắt đầu')
+                self.pushButton.setText('Dừng...')
+                self._account_generator.stop = True
 
     def pushButton_2_clicked(self):
         path = os.path.join(os.getcwd(), 'output')
         os.makedirs(path, exist_ok=True)
         os.startfile(path)
+
+    def _task_finished(self):
+        self.pushButton.setText('Bắt đầu')
+        QMessageBox.information(self, 'Thông báo', 'Đã dừng')
