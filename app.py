@@ -1,4 +1,10 @@
-from roblox import Roblox
+from windows import MainWindow
+from PyQt5.QtWidgets import QApplication
 
 
-rblx = Roblox()
+app = QApplication([])
+
+win = MainWindow()
+win.show()
+
+app.exec_()
