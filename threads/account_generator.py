@@ -9,7 +9,7 @@ from PyQt5.QtCore import QThread, QThreadPool, QRunnable, QReadWriteLock, QMutex
 
 
 def get_proxy(count: int = 1) -> queue.Queue:
-    with open(os.path.join(os.getcwd(), 'API_Link.txt'), encoding='utf-8') as file:
+    with open(os.path.join(os.getcwd(), 'API_Links.txt'), encoding='utf-8') as file:
         api_links = file.read().strip().splitlines()
 
     api_link = random.choice(api_links)
