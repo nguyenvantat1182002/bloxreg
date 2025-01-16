@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>BLOX REG</string>
+   <string>BLOX REG | 00:00:00</string>
   </property>
   <property name="styleSheet">
    <string notr="true">* {
