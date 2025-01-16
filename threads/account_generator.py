@@ -160,16 +160,16 @@ class AccountGeneratorRunnable(QRunnable):
                         self._parent.rw_lock.unlock()
                 except ProxyError:
                     self._should_change_proxy = True
-                except Exception:
-                    pass
+                except Exception as ex:
+                    print(ex)
                 finally:
                     with QMutexLocker(self._parent.mutex):
                         try:
                             rblx.page.quit(timeout=10, del_data=True)
                         except Exception:
                             pass
-            except Exception:
-                pass
+            except Exception as ex:
+                print(ex)
 
             self._current_reg_count += 1
             
