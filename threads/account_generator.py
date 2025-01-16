@@ -148,7 +148,8 @@ class AccountGeneratorRunnable(QRunnable):
                     proxy = self._parent.proxies.get_nowait()
 
             try:
-                rblx = Roblox(proxy, self._browser_location)
+                with QMutexLocker(self._parent.mutex):
+                    rblx = Roblox(proxy, self._browser_location)
 
                 try:
                     acc = rblx.signup(timeout=self._parent.timeout)
