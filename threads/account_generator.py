@@ -150,6 +150,7 @@ class AccountGeneratorRunnable(QRunnable):
             try:
                 with QMutexLocker(self._parent.mutex):
                     rblx = Roblox(proxy, self._browser_location)
+                    QThread.msleep(500)
 
                 try:
                     acc = rblx.signup(timeout=self._parent.timeout)
