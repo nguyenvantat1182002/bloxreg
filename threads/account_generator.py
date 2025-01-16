@@ -147,25 +147,28 @@ class AccountGeneratorRunnable(QRunnable):
 
                     proxy = self._parent.proxies.get_nowait()
 
+            try:
                 rblx = Roblox(proxy, self._browser_location)
 
-            try:
-                acc = rblx.signup(timeout=self._parent.timeout)
-                if acc is not None:
-                    self._parent.rw_lock.lockForWrite()
-                    acc.save()
-                    self._parent.account_added_to_table.emit(acc)
-                    self._parent.rw_lock.unlock()
-            except ProxyError:
-                self._should_change_proxy = True
+                try:
+                    acc = rblx.signup(timeout=self._parent.timeout)
+                    if acc is not None:
+                        self._parent.rw_lock.lockForWrite()
+                        acc.save()
+                        self._parent.account_added_to_table.emit(acc)
+                        self._parent.rw_lock.unlock()
+                except ProxyError:
+                    self._should_change_proxy = True
+                except Exception:
+                    pass
+                finally:
+                    with QMutexLocker(self._parent.mutex):
+                        try:
+                            rblx.page.quit(timeout=10, del_data=True)
+                        except Exception:
+                            pass
             except Exception:
                 pass
-            finally:
-                with QMutexLocker(self._parent.mutex):
-                    try:
-                        rblx.page.quit(timeout=10, del_data=True)
-                    except Exception:
-                        pass
 
             self._current_reg_count += 1
             
