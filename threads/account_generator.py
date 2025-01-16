@@ -136,7 +136,7 @@ class AccountGeneratorRunnable(QRunnable):
             with QMutexLocker(self._parent.mutex):
                 if (not self._current_reg_count == 0 and self._current_reg_count % self._parent.proxy_change_threshold == 0) or self._should_change_proxy:
                     if self._parent.proxies.empty() or self._should_change_proxy:
-                        self._parent.proxies = get_proxy(self._parent.threads if not self._should_change_proxy else 1)
+                        self._parent.proxies = get_proxy(self._parent.threads)
 
                     if self._should_change_proxy:
                         self._should_change_proxy = False
