@@ -1,10 +1,11 @@
 import os
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QTableWidgetItem
 from PyQt5.QtCore import QTimer
 from threads import AccountGeneratorThread
 from datetime import datetime
+from roblox import Account
 
 
 class MainWindow(QMainWindow):
@@ -40,6 +41,7 @@ class MainWindow(QMainWindow):
                 self._account_generator.timeout = self.spinBox_2.value()
                 self._account_generator.proxy_change_threshold = self.spinBox_3.value()
                 self._account_generator.finished.connect(self._task_finished)
+                self._account_generator.account_added_to_table.connect(self._add_account_to_table)
                 self._account_generator.start()
 
                 self._start_time = datetime.now()
@@ -53,6 +55,15 @@ class MainWindow(QMainWindow):
         path = os.path.join(os.getcwd(), 'output')
         os.makedirs(path, exist_ok=True)
         os.startfile(path)
+
+    def _add_account_to_table(self, account: Account):
+        row = self.tableWidget.rowCount()
+        self.tableWidget.insertRow(row)
+        self.tableWidget.setItem(row, 0, QTableWidgetItem(account.username))
+        self.tableWidget.setItem(row, 1, QTableWidgetItem(account.password))
+        self.tableWidget.setItem(row, 2, QTableWidgetItem(account.security_token))
+
+        self.label_3.setText(str(self.self.tableWidget.rowCount()))
 
     def _update_window_title(self):
         elapsed_time = datetime.now() - self._start_time

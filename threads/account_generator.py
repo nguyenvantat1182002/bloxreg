@@ -4,7 +4,7 @@ import os
 import queue
 
 from roblox import Roblox, ProxyError
-from PyQt5.QtCore import QThread, QThreadPool, QRunnable, QReadWriteLock, QMutex, QMutexLocker
+from PyQt5.QtCore import QThread, QThreadPool, QRunnable, QReadWriteLock, QMutex, QMutexLocker, pyqtSignal
 
 
 def get_proxy(count: int = 1) -> queue.Queue:
@@ -25,6 +25,8 @@ def get_proxy(count: int = 1) -> queue.Queue:
 
 
 class AccountGeneratorThread(QThread):
+    account_added_to_table = pyqtSignal(object)
+
     def __init__(self):
         super().__init__()
 
@@ -85,7 +87,7 @@ class AccountGeneratorThread(QThread):
     @proxies.setter
     def proxies(self, value: queue.Queue[str]):
         self._proxies = value
-
+        
     def run(self):
         window_size = pyautogui.size()
         w_w, w_h = window_size.width, window_size.height
@@ -151,6 +153,7 @@ class AccountGeneratorRunnable(QRunnable):
                 if acc is not None:
                     self._parent.rw_lock.lockForWrite()
                     acc.save()
+                    self._parent.account_added_to_table.emit(acc)
                     self._parent.rw_lock.unlock()
             except ProxyError:
                 self._should_change_proxy = True
@@ -158,7 +161,10 @@ class AccountGeneratorRunnable(QRunnable):
                 pass
             finally:
                 with QMutexLocker(self._parent.mutex):
-                    rblx.page.quit(timeout=10, del_data=True)
+                    try:
+                        rblx.page.quit(timeout=10, del_data=True)
+                    except Exception:
+                        pass
 
             self._current_reg_count += 1
             
