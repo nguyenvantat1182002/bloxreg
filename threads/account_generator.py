@@ -108,13 +108,13 @@ class AccountGeneratorThread(QThread):
                     item = AccountGeneratorRunnable(self, (x, y))
                     self._pool.start(item)
 
-                    x += b_w
+                    x += Roblox.BROWSER_WIDTH - 16
                     created_threads += 1
 
                     QThread.msleep(300)
 
                 x = 0
-                y += b_h
+                y += Roblox.BROWSER_HEIGHT
 
         self._pool.waitForDone()
 
