@@ -1,5 +1,6 @@
 import random
 import string
+import os
 
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
@@ -46,3 +47,10 @@ class Account:
         gender = random.randint(1, 2)
 
         return cls(birthday, username, password, gender)
+    
+    def save(self):
+        path = os.path.join(os.getcwd(), 'output')
+        os.makedirs(path, exist_ok=True)
+        
+        with open(os.path.join(path, 'accounts.txt'), 'a', encoding='utf-8') as file:
+            file.write(f'{self.username}|{self.password}/{self.security_token}\n')

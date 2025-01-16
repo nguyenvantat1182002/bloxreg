@@ -12,8 +12,18 @@ class MainWindow(QMainWindow):
 
         self.pushButton.clicked.connect(self.pushButton_clicked)
         self.pushButton_2.clicked.connect(self.pushButton_2_clicked)
+        self.spinBox_2.valueChanged.connect(self.spinBox_2_valueChanged)
+        self.spinBox_3.valueChanged.connect(self.spinBox_3_valueChanged)
 
         self._account_generator = None
+
+    def spinBox_3_valueChanged(self, value: int):
+        if self._account_generator:
+            self._account_generator.proxy_change_threshold = value
+
+    def spinBox_2_valueChanged(self, value: int):
+        if self._account_generator:
+            self._account_generator.timeout = value
 
     def pushButton_clicked(self):
         match self.pushButton.text():

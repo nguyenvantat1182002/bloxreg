@@ -1,6 +1,6 @@
 import pyautogui
 
-from PyQt5.QtCore import QThread, QThreadPool, QRunnable
+from PyQt5.QtCore import QThread, QThreadPool, QRunnable, QReadWriteLock
 
 
 class AccountGeneratorThread(QThread):
@@ -9,7 +9,9 @@ class AccountGeneratorThread(QThread):
 
         self._threads = 1
         self._timeout = 30
+        self._proxy_change_threshold = 1
         self._stop = False
+        self._rw_lock = QReadWriteLock()
         self._pool = QThreadPool()
         self._pool.setMaxThreadCount(9999)
 
@@ -30,12 +32,24 @@ class AccountGeneratorThread(QThread):
         self._timeout = value
 
     @property
+    def proxy_change_threshold(self) -> int:
+        return self._proxy_change_threshold
+
+    @proxy_change_threshold.setter
+    def proxy_change_threshold(self, value: int):
+        self._proxy_change_threshold = value
+
+    @property
     def stop(self) -> int:
         return self._stop
 
     @stop.setter
     def stop(self, value: int):
         self._stop = value
+
+    @property
+    def rw_lock(self) -> QReadWriteLock:
+        return self._rw_lock
 
     def run(self):
         window_size = pyautogui.size()
