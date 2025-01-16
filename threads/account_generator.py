@@ -87,7 +87,7 @@ class AccountGeneratorThread(QThread):
     @proxies.setter
     def proxies(self, value: queue.Queue[str]):
         self._proxies = value
-        
+
     def run(self):
         window_size = pyautogui.size()
         w_w, w_h = window_size.width, window_size.height
@@ -141,8 +141,7 @@ class AccountGeneratorRunnable(QRunnable):
                     if self._should_change_proxy:
                         self._should_change_proxy = False
                     
-                    if self._parent.proxy_change_threshold < 2:
-                        QThread.msleep(5000)
+                    QThread.msleep(5000 if self._parent.proxy_change_threshold < 2 else 3000)
 
                     proxy = self._parent.proxies.get_nowait()
 
