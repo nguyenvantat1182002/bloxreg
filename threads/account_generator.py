@@ -2,6 +2,7 @@ import pyautogui
 import requests
 import os
 import queue
+import random
 
 from roblox import Roblox, ProxyError
 from PyQt5.QtCore import QThread, QThreadPool, QRunnable, QReadWriteLock, QMutex, QMutexLocker, pyqtSignal
@@ -9,8 +10,9 @@ from PyQt5.QtCore import QThread, QThreadPool, QRunnable, QReadWriteLock, QMutex
 
 def get_proxy(count: int = 1) -> queue.Queue:
     with open(os.path.join(os.getcwd(), 'API_Link.txt'), encoding='utf-8') as file:
-        api_link = file.read().strip()
+        api_links = file.read().strip().splitlines()
 
+    api_link = random.choice(api_links)
     api_link = api_link.replace('num=1', f'num={count}')
 
     response = requests.get(api_link)
