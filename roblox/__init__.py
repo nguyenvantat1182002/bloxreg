@@ -16,6 +16,7 @@ class Roblox:
         options = ChromiumOptions().auto_port()
         options.set_tmp_path(os.path.join(os.getcwd(), 'profiles'))
         options.set_pref('partition.default_zoom_level.x', -3.8017840169239308)
+        options.set_pref('credentials_enable_service', False)
         options.no_imgs()
 
         if proxy:
@@ -45,11 +46,11 @@ class Roblox:
 
         for key, value in zip(('#MonthDropdown', '#DayDropdown', '#YearDropdown'), account.birthday):
             self._page.ele(key).select.by_value(value)
-            time.sleep(.8)
+            time.sleep(.3)
 
         for key, value in zip(('#signup-username', '#signup-password'), (account.username, account.password)):
             self._page.ele(key).input(value)
-            time.sleep(1)
+            time.sleep(.5)
 
         self._page.ele('#MaleButton' if account.gender == 1 else '#FemaleButton').click()
         time.sleep(1)
