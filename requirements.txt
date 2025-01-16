@@ -2,3 +2,4 @@ DrissionPage
 pyqt5
 pyqt5designer
 pyautogui
+requests

@@ -1,6 +1,27 @@
 import pyautogui
+import requests
+import os
+import queue
 
-from PyQt5.QtCore import QThread, QThreadPool, QRunnable, QReadWriteLock
+from roblox import Roblox, ProxyError
+from PyQt5.QtCore import QThread, QThreadPool, QRunnable, QReadWriteLock, QMutex, QMutexLocker
+
+
+def get_proxy(count: int = 1) -> queue.Queue:
+    with open(os.path.join(os.getcwd(), 'API_Link.txt'), encoding='utf-8') as file:
+        api_link = file.read().strip()
+
+    api_link = api_link.replace('num=1', f'num={count}')
+
+    response = requests.get(api_link)
+
+    items = response.text.strip().splitlines()
+    q = queue.Queue()
+    
+    for item in items:
+        q.put_nowait(item)
+
+    return q
 
 
 class AccountGeneratorThread(QThread):
@@ -12,6 +33,8 @@ class AccountGeneratorThread(QThread):
         self._proxy_change_threshold = 1
         self._stop = False
         self._rw_lock = QReadWriteLock()
+        self._mutex = QMutex()
+        self._proxies = queue.Queue()
         self._pool = QThreadPool()
         self._pool.setMaxThreadCount(9999)
 
@@ -50,22 +73,41 @@ class AccountGeneratorThread(QThread):
     @property
     def rw_lock(self) -> QReadWriteLock:
         return self._rw_lock
+    
+    @property
+    def mutex(self) -> QMutex:
+        return self._mutex
+    
+    @property
+    def proxies(self) -> queue.Queue[str]:
+        return self._proxies
+    
+    @proxies.setter
+    def proxies(self, value: queue.Queue[str]):
+        self._proxies = value
 
     def run(self):
         window_size = pyautogui.size()
         w_w, w_h = window_size.width, window_size.height
         b_w, b_h = 392, 429
         cols, rows = w_w // b_w, w_h // b_h
-        
+        created_threads = 0
+
+        self._proxies = get_proxy(self.threads)
+
         for _ in range(self.threads):
             x = y = 0
-            
+
             for _ in range(rows):
                 for _ in range(cols):
+                    if created_threads >= self.threads:
+                        break
+
                     item = AccountGeneratorRunnable(self, (x, y))
                     self._pool.start(item)
 
                     x += b_w
+                    created_threads += 1
 
                     QThread.msleep(300)
 
@@ -81,8 +123,42 @@ class AccountGeneratorRunnable(QRunnable):
 
         self._parent = parent
         self._browser_location = browser_location
+        self._current_reg_count = 0
+        self._should_change_proxy = False
 
     def run(self):
-        while not self._parent.stop:
-            pass
+        with QMutexLocker(self._parent.mutex):
+            proxy = self._parent.proxies.get_nowait()
 
+        while not self._parent.stop:
+            with QMutexLocker(self._parent.mutex):
+                if (not self._current_reg_count == 0 and self._current_reg_count % self._parent.proxy_change_threshold == 0) or self._should_change_proxy:
+                    if self._parent.proxies.empty() or self._should_change_proxy:
+                        self._parent.proxies = get_proxy(self._parent.threads if not self._should_change_proxy else 1)
+
+                    if self._should_change_proxy:
+                        self._should_change_proxy = False
+                    
+                    if self._parent.proxy_change_threshold < 2:
+                        QThread.msleep(5000)
+
+                    proxy = self._parent.proxies.get_nowait()
+
+                rblx = Roblox(proxy, self._browser_location)
+
+            try:
+                acc = rblx.signup(timeout=self._parent.timeout)
+                if acc is not None:
+                    self._parent.rw_lock.lockForWrite()
+                    acc.save()
+                    self._parent.rw_lock.unlock()
+            except ProxyError:
+                self._should_change_proxy = True
+            except Exception:
+                pass
+            finally:
+                with QMutexLocker(self._parent.mutex):
+                    rblx.page.quit(timeout=10, del_data=True)
+
+            self._current_reg_count += 1
+            

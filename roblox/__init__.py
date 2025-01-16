@@ -25,6 +25,10 @@ class Roblox:
         self._page.set.window.size(520 + 16, 569 - 7)
         self._page.set.window.location(*(browser_location if browser_location else (0, 0)))
 
+    @property
+    def page(self) -> ChromiumPage:
+        return self._page
+
     def signup(self, account: Optional[Account] = None, timeout: int = 30) -> Optional[Account]:
         if not account:
             account = Account.create_random()

@@ -38,6 +38,7 @@ class MainWindow(QMainWindow):
                 self._account_generator = AccountGeneratorThread()
                 self._account_generator.threads = self.spinBox.value()
                 self._account_generator.timeout = self.spinBox_2.value()
+                self._account_generator.proxy_change_threshold = self.spinBox_3.value()
                 self._account_generator.finished.connect(self._task_finished)
                 self._account_generator.start()
 
