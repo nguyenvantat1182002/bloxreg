@@ -63,7 +63,7 @@ class MainWindow(QMainWindow):
         self.tableWidget.setItem(row, 1, QTableWidgetItem(account.password))
         self.tableWidget.setItem(row, 2, QTableWidgetItem(account.security_token))
 
-        self.label_3.setText(str(self.self.tableWidget.rowCount()))
+        self.label_3.setText(str(self.tableWidget.rowCount()))
 
     def _update_window_title(self):
         elapsed_time = datetime.now() - self._start_time
