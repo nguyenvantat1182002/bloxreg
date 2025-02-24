@@ -1,6 +1,8 @@
 import os
 import time
+import socket
 
+from contextlib import closing
 from datetime import datetime, timedelta
 from typing import Optional
 from DrissionPage import ChromiumPage, ChromiumOptions
@@ -8,12 +10,22 @@ from .account import Account
 from .exceptions import ProxyError
 
 
+def random_port(host: str = None):
+    if not host:
+        host = ''
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        s.bind((host, 0))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return s.getsockname()[1]
+    
+
 class Roblox:
     BROWSER_WIDTH = 520
     BROWSER_HEIGHT = 569
 
     def __init__(self, proxy: Optional[str] = None, browser_location: Optional[tuple] = None):
-        options = ChromiumOptions().auto_port()
+        options = ChromiumOptions()
+        options.set_local_port(random_port())
         options.set_tmp_path(os.path.join(os.getcwd(), 'profiles'))
         options.set_pref('partition.default_zoom_level.x', -3.8017840169239308)
         options.set_pref('credentials_enable_service', False)
