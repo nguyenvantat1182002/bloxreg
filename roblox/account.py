@@ -17,8 +17,8 @@ class Account:
     @classmethod
     def create_random(cls) -> 'Account':
         current_year = datetime.now().year
-        min_year = current_year - 13
-        max_year = current_year - 25
+        min_year = current_year - 25
+        max_year = current_year - 40
         year = random.randint(max_year, min_year)
 
         month = random.randint(1, 12)

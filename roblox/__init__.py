@@ -33,12 +33,12 @@ class Roblox:
     def page(self) -> ChromiumPage:
         return self._page
 
-    def signup(self, account: Optional[Account] = None, timeout: int = 30) -> Optional[Account]:
+    def signup(self, sigup_link: str, account: Optional[Account] = None, timeout: int = 30) -> Optional[Account]:
         if not account:
             account = Account.create_random()
 
         try:
-            self._page.get('https://www.roblox.com/', show_errmsg=True)
+            self._page.get(sigup_link, show_errmsg=True)
         except Exception:
             raise ProxyError
         
@@ -48,12 +48,14 @@ class Roblox:
             self._page.ele(key).select.by_value(value)
             time.sleep(.3)
 
-        for key, value in zip(('#signup-username', '#signup-password'), (account.username, account.password)):
-            self._page.ele(key).input(value)
-            time.sleep(.5)
+        # for key, value in zip(('#signup-username', '#signup-password'), (account.username, account.password)):
+        #     self._page.ele(key).input(value)
+        #     time.sleep(.5)
 
-        self._page.ele('#MaleButton' if account.gender == 1 else '#FemaleButton').click()
-        time.sleep(1)
+        # self._page.ele('#MaleButton' if account.gender == 1 else '#FemaleButton').click()
+        # time.sleep(1)
+
+        time.sleep(2)
 
         try:
             self._page.ele('#signup-button').wait.enabled(timeout=5, raise_err=True).click()
@@ -73,4 +75,3 @@ class Roblox:
             time.sleep(1)
 
         return account
-    

@@ -26,6 +26,18 @@ def get_proxy(count: int = 1) -> queue.Queue:
     return q
 
 
+def get_signup_links() -> queue.Queue[str]:
+    q = queue.Queue()
+
+    with open(os.path.join(os.getcwd(), 'signup_links.txt'), encoding='utf-8') as file:
+        lines = file.read().splitlines()
+
+    for line in lines:
+        q.put_nowait(line)
+
+    return q
+
+
 class AccountGeneratorThread(QThread):
     account_added_to_table = pyqtSignal(object)
 
@@ -98,6 +110,7 @@ class AccountGeneratorThread(QThread):
         created_threads = 0
 
         self._proxies = get_proxy(self.threads)
+        signup_links = get_signup_links()
 
         for _ in range(self.threads):
             x = y = 0
@@ -107,7 +120,7 @@ class AccountGeneratorThread(QThread):
                     if created_threads >= self.threads:
                         break
 
-                    item = AccountGeneratorRunnable(self, (x, y))
+                    item = AccountGeneratorRunnable(self, signup_links, (x, y))
                     self._pool.start(item)
 
                     x += Roblox.BROWSER_WIDTH - 16
@@ -122,10 +135,11 @@ class AccountGeneratorThread(QThread):
 
 
 class AccountGeneratorRunnable(QRunnable):
-    def __init__(self, parent: AccountGeneratorThread, browser_location: tuple):
+    def __init__(self, parent: AccountGeneratorThread, signup_links: queue.Queue[str], browser_location: tuple):
         super().__init__()
 
         self._parent = parent
+        self._signup_links = signup_links
         self._browser_location = browser_location
         self._current_reg_count = 0
         self._should_change_proxy = False
@@ -150,19 +164,29 @@ class AccountGeneratorRunnable(QRunnable):
             try:
                 with QMutexLocker(self._parent.mutex):
                     rblx = Roblox(proxy, self._browser_location)
+                    signup_link = self._signup_links.get_nowait()
                     QThread.msleep(1000)
 
                 try:
-                    acc = rblx.signup(timeout=self._parent.timeout)
-                    if acc is not None:
+                    account = rblx.signup(signup_link, timeout=self._parent.timeout)
+                    if account is not None:
                         self._parent.rw_lock.lockForWrite()
-                        acc.save()
-                        self._parent.account_added_to_table.emit(acc)
+                        account.save()
+                        self._parent.account_added_to_table.emit(account)
                         self._parent.rw_lock.unlock()
+                    else:
+                        with QMutexLocker(self._parent.mutex):
+                            self._signup_links.put_nowait(signup_link)
                 except ProxyError:
                     self._should_change_proxy = True
+
+                    with QMutexLocker(self._parent.mutex):
+                        self._signup_links.put_nowait(signup_link)
                 except Exception as ex:
                     print(ex)
+                    
+                    with QMutexLocker(self._parent.mutex):
+                        self._signup_links.put_nowait(signup_link)
                 finally:
                     with QMutexLocker(self._parent.mutex):
                         try:
