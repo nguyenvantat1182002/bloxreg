@@ -56,7 +56,7 @@ class Roblox:
         except Exception:
             raise ProxyError
         
-        time.sleep(2)
+        time.sleep(1)
 
         for key, value in zip(('#MonthDropdown', '#DayDropdown', '#YearDropdown'), account.birthday):
             self._page.ele(key).select.by_value(value)
@@ -82,10 +82,8 @@ class Roblox:
                 break
 
             iframe = self._page('css:iframe[id="arkose-iframe"]', timeout=3)
-            if iframe:
-                attrs = iframe.attrs
-                if 'height' in attrs and 'width' in attrs:
-                    return None
+            if iframe and {'height', 'width'}.issubset(iframe.attrs):
+                return None
                 
             if datetime.now() > end_time:
                 return None
