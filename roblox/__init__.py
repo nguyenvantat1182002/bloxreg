@@ -27,20 +27,20 @@ class Roblox:
         options = ChromiumOptions()
         options.set_local_port(random_port())
         options.set_tmp_path(os.path.join(os.getcwd(), 'profiles'))
-        # options.set_pref('partition.default_zoom_level.x', -3.8017840169239308)
+        options.set_pref('partition.default_zoom_level.x', -3.8017840169239308)
         options.set_pref('credentials_enable_service', False)
         options.no_imgs()
 
         if proxy:
             options.set_proxy(proxy)
 
-        # options.set_argument('--force-device-scale-factor', .75)
-        # options.set_argument('--high-dpi-support', .75)
+        options.set_argument('--force-device-scale-factor', .75)
+        options.set_argument('--high-dpi-support', .75)
         options.set_argument('--disable-features', 'PreloadMediaEngagementData,MediaPreloadExperimental')
-        # options.set_argument('--user-agent', 'Mozilla/5.0 (Linux; Android 13; SM-S908B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36')
+        options.set_argument('--user-agent', 'Mozilla/5.0 (Linux; Android 13; SM-S908B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36')
         
         self._page = ChromiumPage(addr_or_opts=options)
-        # self._page.set.window.size(Roblox.BROWSER_WIDTH + 16, Roblox.BROWSER_HEIGHT - 7)
+        self._page.set.window.size(Roblox.BROWSER_WIDTH + 16, Roblox.BROWSER_HEIGHT - 7)
         self._page.set.window.location(*(browser_location if browser_location else (0, 0)))
 
     @property
