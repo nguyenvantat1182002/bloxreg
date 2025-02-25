@@ -177,13 +177,9 @@ class AccountGeneratorRunnable(QRunnable):
                     else:
                         with QMutexLocker(self._parent.mutex):
                             self._signup_links.put_nowait(signup_link)
-                except ProxyError:
-                    self._should_change_proxy = True
-
-                    with QMutexLocker(self._parent.mutex):
-                        self._signup_links.put_nowait(signup_link)
-                except Exception as ex:
-                    print(ex)
+                except (ProxyError, Exception) as ex:
+                    if type(ex).__name__ == 'ProxyError':
+                        self._should_change_proxy = True
                     
                     with QMutexLocker(self._parent.mutex):
                         self._signup_links.put_nowait(signup_link)
