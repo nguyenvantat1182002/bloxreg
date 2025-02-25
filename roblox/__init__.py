@@ -36,6 +36,8 @@ class Roblox:
 
         options.set_argument('--force-device-scale-factor', .75)
         options.set_argument('--high-dpi-support', .75)
+        options.set_argument('--disable-features', 'PreloadMediaEngagementData,MediaPreloadExperimental')
+        options.set_argument('--user-agent', 'Mozilla/5.0 (Linux; Android 13; SM-S908B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36')
         
         self._page = ChromiumPage(addr_or_opts=options)
         self._page.set.window.size(Roblox.BROWSER_WIDTH + 16, Roblox.BROWSER_HEIGHT - 7)
