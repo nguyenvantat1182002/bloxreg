@@ -56,11 +56,8 @@ class Roblox:
         except Exception:
             raise ProxyError
         
-        time.sleep(1)
-
         for key, value in zip(('#MonthDropdown', '#DayDropdown', '#YearDropdown'), account.birthday):
             self._page.ele(key).select.by_value(value)
-            time.sleep(.05)
 
         # for key, value in zip(('#signup-username', '#signup-password'), (account.username, account.password)):
         #     self._page.ele(key).input(value)
