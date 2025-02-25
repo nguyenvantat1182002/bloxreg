@@ -70,7 +70,7 @@ class Roblox:
         # time.sleep(1)
         
         try:
-            self._page.ele('#signup-button').wait.enabled(timeout=5, raise_err=True).click()
+            self._page.ele('#signup-button').wait.enabled(timeout=10, raise_err=True).click()
         except Exception:
             return self.signup(sigup_link)
         
