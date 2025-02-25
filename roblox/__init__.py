@@ -78,9 +78,6 @@ class Roblox:
         
         end_time = datetime.now() + timedelta(seconds=timeout)
         while True:
-            if datetime.now() > end_time:
-                return None
-            
             item = list(filter(lambda x: x['name'] == '.ROBLOSECURITY', self._page.cookies()))
             if item:
                 account.security_token = item[-1]['value']
@@ -91,6 +88,9 @@ class Roblox:
                 attrs = iframe.attrs
                 if 'height' in attrs and 'width' in attrs:
                     return None
+                
+            if datetime.now() > end_time:
+                return None
 
             time.sleep(1)
 
