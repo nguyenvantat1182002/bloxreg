@@ -63,6 +63,8 @@ class MainWindow(QMainWindow):
         self.tableWidget.setItem(row, 1, QTableWidgetItem(account.password))
         self.tableWidget.setItem(row, 2, QTableWidgetItem(account.security_token))
 
+        self.tableWidget.scrollToBottom()
+
         self.label_3.setText(str(self.tableWidget.rowCount()))
 
     def _update_window_title(self):
