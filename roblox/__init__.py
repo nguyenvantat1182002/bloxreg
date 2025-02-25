@@ -87,9 +87,10 @@ class Roblox:
                 break
 
             iframe = self._page('css:iframe[id="arkose-iframe"]', timeout=3)
-            attrs = iframe.attrs
-            if iframe and ('height' in attrs and 'width' in attrs):
-                return None
+            if iframe:
+                attrs = iframe.attrs
+                if 'height' in attrs and 'width' in attrs:
+                    return None
 
             time.sleep(1)
 
