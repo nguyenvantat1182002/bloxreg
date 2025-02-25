@@ -56,11 +56,11 @@ class Roblox:
         except Exception:
             raise ProxyError
         
-        time.sleep(3)
+        time.sleep(2)
 
         for key, value in zip(('#MonthDropdown', '#DayDropdown', '#YearDropdown'), account.birthday):
             self._page.ele(key).select.by_value(value)
-            time.sleep(.3)
+            time.sleep(.05)
 
         # for key, value in zip(('#signup-username', '#signup-password'), (account.username, account.password)):
         #     self._page.ele(key).input(value)
@@ -68,9 +68,7 @@ class Roblox:
 
         # self._page.ele('#MaleButton' if account.gender == 1 else '#FemaleButton').click()
         # time.sleep(1)
-
-        time.sleep(2)
-
+        
         try:
             self._page.ele('#signup-button').wait.enabled(timeout=5, raise_err=True).click()
         except Exception:
