@@ -5,3 +5,4 @@ pyautogui
 requests
 qdarkstyle
 tls-client
+beautifulsoup4

@@ -12,6 +12,9 @@ class Account:
     username: str
     password: str
     gender: int
+    email: str = field(init=False, default=None)
+    email_password: str = field(init=False, default=None)
+    signup_link: str = field(init=False, default=None)
     security_token: str = field(init=False, default=None)
     
     @classmethod
@@ -53,4 +56,4 @@ class Account:
         os.makedirs(path, exist_ok=True)
         
         with open(os.path.join(path, 'accounts.txt'), 'a', encoding='utf-8') as file:
-            file.write(f'{self.username}|{self.password}/{self.security_token}\n')
+            file.write(f'{self.email}:{self.email_password}:{self.username}:nopass:{self.security_token}\n')
