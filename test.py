@@ -21,4 +21,14 @@
 # options.set_user_data_path(os.path.join(os.getcwd(), 'profiles', str(port)))
 
 # page = ChromiumPage(addr_or_opts=options)
-# page.quit()
+
+# page.listen.start('https://auth.roblox.com/v2/signup')
+# for packet in page.listen.steps():
+#     packet.request.postData.update({'username': 'nguyenvantat123332'})
+#     print(packet.request.postData)
+
+from seleniumwire import webdriver
+
+
+driver = webdriver.Chrome()
+driver.get('https://roblox.com/')

@@ -154,6 +154,11 @@ class AccountGeneratorRunnable(QRunnable):
 
         while not self._parent.stop:
             with QMutexLocker(self._parent.mutex):
+                if self._signup_links.empty():
+                    break
+                
+                account = self._signup_links.get_nowait()
+
                 if (self._current_reg_count % self._parent.proxy_change_threshold == 0) or self._should_change_proxy:
                     if self._parent.proxies.empty() or self._should_change_proxy:
                         self._parent.proxies = get_proxy(self._parent.threads)
@@ -166,7 +171,6 @@ class AccountGeneratorRunnable(QRunnable):
                 print(proxy)
                 
                 rblx = Roblox(proxy, self._browser_location)
-                account = self._signup_links.get_nowait()
                 
             try:
                 result = rblx.signup(account.signup_link, timeout=self._parent.timeout)
