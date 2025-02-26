@@ -163,6 +163,8 @@ class AccountGeneratorRunnable(QRunnable):
                     
                     proxy = self._parent.proxies.get_nowait()
 
+                print(proxy)
+                
                 rblx = Roblox(proxy, self._browser_location)
                 account = self._signup_links.get_nowait()
                 
