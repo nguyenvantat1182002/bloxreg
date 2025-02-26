@@ -55,7 +55,8 @@ class AccountGeneratorThread(QThread):
         self._stop = False
         self._rw_lock = QReadWriteLock()
         self._mutex = QMutex()
-        self._proxies = queue.Queue()
+        self._proxies: queue.Queue[str] = queue.Queue()
+        self._signup_links: queue.Queue[Account] = queue.Queue()
         self._pool = QThreadPool()
         self._pool.setMaxThreadCount(9999)
 
@@ -107,6 +108,14 @@ class AccountGeneratorThread(QThread):
     def proxies(self, value: queue.Queue[str]):
         self._proxies = value
 
+    @property
+    def signup_links(self) -> queue.Queue[Account]:
+        return self._signup_links
+    
+    @signup_links.setter
+    def signup_links(self, value: queue.Queue[Account]):
+        self._signup_links = value
+
     def run(self):
         window_size = pyautogui.size()
         w_w, w_h = window_size.width, window_size.height
@@ -115,7 +124,7 @@ class AccountGeneratorThread(QThread):
         created_threads = 0
 
         self._proxies = get_proxy(self.threads)
-        signup_links = get_signup_links()
+        self._signup_links = get_signup_links()
 
         for _ in range(self.threads):
             x = y = 0
@@ -125,7 +134,7 @@ class AccountGeneratorThread(QThread):
                     if created_threads >= self.threads:
                         break
 
-                    item = AccountGeneratorRunnable(self, signup_links, (x, y))
+                    item = AccountGeneratorRunnable(self, (x, y))
                     self._pool.start(item)
 
                     x += Roblox.BROWSER_WIDTH - 16
@@ -137,14 +146,18 @@ class AccountGeneratorThread(QThread):
                 y += Roblox.BROWSER_HEIGHT
 
         self._pool.waitForDone()
+
+        with open('valid_links.txt', 'a', encoding='utf-8') as file:
+            while not self._signup_links.empty():
+                account = self._signup_links.get_nowait()
+                file.write(f'{account.email}|{account.email_password}|{account.signup_link}\n')
         
         
 class AccountGeneratorRunnable(QRunnable):
-    def __init__(self, parent: AccountGeneratorThread, signup_links: queue.Queue[Account], browser_location: tuple):
+    def __init__(self, parent: AccountGeneratorThread, browser_location: tuple):
         super().__init__()
 
         self._parent = parent
-        self._signup_links = signup_links
         self._browser_location = browser_location
         self._current_reg_count = 0
         self._should_change_proxy = False
@@ -154,10 +167,10 @@ class AccountGeneratorRunnable(QRunnable):
 
         while not self._parent.stop:
             with QMutexLocker(self._parent.mutex):
-                if self._signup_links.empty():
+                if self._parent.signup_links.empty():
                     break
                 
-                account = self._signup_links.get_nowait()
+                account = self._parent.signup_links.get_nowait()
 
                 if (self._current_reg_count % self._parent.proxy_change_threshold == 0) or self._should_change_proxy:
                     if self._parent.proxies.empty() or self._should_change_proxy:
@@ -184,7 +197,7 @@ class AccountGeneratorRunnable(QRunnable):
                     self._parent.rw_lock.unlock()
                 else:
                     with QMutexLocker(self._parent.mutex):
-                        self._signup_links.put_nowait(account)
+                        self._parent.signup_links.put_nowait(account)
             except (ProxyError, Exception) as ex:
                 ex_name = type(ex).__name__
 
@@ -193,7 +206,7 @@ class AccountGeneratorRunnable(QRunnable):
                 
                 if not ex_name == 'LinkAlreadyUsedError':
                     with QMutexLocker(self._parent.mutex):
-                        self._signup_links.put_nowait(account)
+                        self._parent.signup_links.put_nowait(account)
             finally:
                 with QMutexLocker(self._parent.mutex):
                     try:

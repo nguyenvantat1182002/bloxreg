@@ -28,7 +28,21 @@
 #     print(packet.request.postData)
 
 from seleniumwire import webdriver
+import json
 
 
+def interceptor(request):
+    if 'roblox' in request.url:
+        print(request.url)
+
+        if request.method == 'POST' and request.url == 'https://auth.roblox.com/v2/signup':
+            body = request.body.decode('utf-8')
+            data = json.loads(body)
+            print(data)
+
+            data['username'] = 'nguyenvantat223ijjng3'
+            
 driver = webdriver.Chrome()
-driver.get('https://roblox.com/')
+driver.request_interceptor = interceptor
+driver.get('https://chromewebstore.google.com/detail/browsec-vpn-free-vpn-for/omghfjlpggmjjaagoclmmobgdodcjboh')
+# driver.get('https://www.roblox.com/signup?dataToken=JTWCVM44JDH76M7XGGD66HBMHB3XF4B4&source=VerifiedParentalConsent&requestType=LinkToChild&sessionId=051868df-961c-494d-b3f0-72658021c9c9')
