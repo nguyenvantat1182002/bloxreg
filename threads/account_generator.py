@@ -147,11 +147,6 @@ class AccountGeneratorThread(QThread):
 
         self._pool.waitForDone()
 
-        with open('valid_links.txt', 'a', encoding='utf-8') as file:
-            while not self._signup_links.empty():
-                account = self._signup_links.get_nowait()
-                file.write(f'{account.email}|{account.email_password}|{account.signup_link}\n')
-        
         
 class AccountGeneratorRunnable(QRunnable):
     def __init__(self, parent: AccountGeneratorThread, browser_location: tuple):
@@ -187,12 +182,14 @@ class AccountGeneratorRunnable(QRunnable):
                 
             try:
                 result = rblx.signup(account.signup_link, timeout=self._parent.timeout)
+                # result = rblx.signup(timeout=self._parent.timeout)
             
                 if result is not None:
                     self._parent.rw_lock.lockForWrite()
                     account.username = result.username
-                    account.security_token = result.security_token
-                    account.save()
+                    result.security_token = result.security_token
+                    result.save()
+                    self._parent.account_added_to_table.emit(result)
                     self._parent.account_added_to_table.emit(account)
                     self._parent.rw_lock.unlock()
                 else:

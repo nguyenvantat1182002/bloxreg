@@ -20,6 +20,8 @@ class Account:
     @classmethod
     def create_random(cls) -> 'Account':
         current_year = datetime.now().year
+        # min_year = current_year - 6
+        # max_year = current_year - 13
         min_year = current_year - 25
         max_year = current_year - 40
         year = random.randint(max_year, min_year)
@@ -57,3 +59,4 @@ class Account:
         
         with open(os.path.join(path, 'accounts.txt'), 'a', encoding='utf-8') as file:
             file.write(f'{self.email}:{self.email_password}:{self.username}:nopass:{self.security_token}\n')
+            # file.write(f'{self.security_token}\n')

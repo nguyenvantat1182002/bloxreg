@@ -49,11 +49,13 @@ class Roblox:
     def close(self):
         self._page.quit(del_data=True)
 
+    # def signup(self, account: Optional[Account] = None, timeout: int = 30) -> Optional[Account]:
     def signup(self, sigup_link: str, account: Optional[Account] = None, timeout: int = 30) -> Optional[Account]:
         if not account:
             account = Account.create_random()
 
         try:
+            # self._page.get('https://www.roblox.com/', show_errmsg=True)
             self._page.get(sigup_link, show_errmsg=True)
         except Exception:
             raise ProxyError
@@ -61,9 +63,15 @@ class Roblox:
         for key, value in zip(('#MonthDropdown', '#DayDropdown', '#YearDropdown'), account.birthday):
             self._page.ele(key).select.by_value(value)
             
+        # for key, value in zip(('#signup-username', '#signup-password'), (account.username, account.password)):
+        #     self._page.ele(key).input(value)
+
+        # self._page.ele('#MaleButton' if account.gender == 1 else '#FemaleButton').click()
+        
         try:
             self._page.ele('#signup-button').wait.enabled(timeout=10, raise_err=True).click()
         except Exception:
+            # return self.signup()
             return self.signup(sigup_link)
         
         end_time = datetime.now() + timedelta(seconds=timeout)

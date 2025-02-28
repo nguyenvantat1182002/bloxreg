@@ -1,1 +1,6 @@
 http://api.proxy.ip2world.com/getProxyIp?lb=1&return_type=txt&protocol=http&num=1&regions=id
+http://api.proxy.ip2world.com/getProxyIp?lb=1&return_type=txt&protocol=http&num=1&regions=th
+http://api.proxy.ip2world.com/getProxyIp?lb=1&return_type=txt&protocol=http&num=1&regions=mm
+http://api.proxy.ip2world.com/getProxyIp?lb=1&return_type=txt&protocol=http&num=1&regions=my
+http://api.proxy.ip2world.com/getProxyIp?lb=1&return_type=txt&protocol=http&num=1&regions=ph
+http://api.proxy.ip2world.com/getProxyIp?lb=1&return_type=txt&protocol=http&num=1&regions=sg
