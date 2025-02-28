@@ -28,10 +28,12 @@ def get_proxy(count: int = 1) -> queue.Queue[str]:
 
 def get_signup_links() -> queue.Queue[Account]:
     q = queue.Queue()
+    file_path = os.path.join(os.getcwd(), 'signup_links.txt')
 
-    with open(os.path.join(os.getcwd(), 'signup_links.txt'), encoding='utf-8') as file:
+    with open(file_path, 'r+', encoding='utf-8') as file:
         lines = file.read().splitlines()
-
+        file.truncate(0)
+        
     for line in lines:
         email, password, signup_link = line.split('|')
         item = Account.create_random()
@@ -163,7 +165,8 @@ class AccountGeneratorRunnable(QRunnable):
         while not self._parent.stop:
             with QMutexLocker(self._parent.mutex):
                 if self._parent.signup_links.empty():
-                    break
+                    self._parent.signup_links = get_signup_links()
+                    continue
                 
                 account = self._parent.signup_links.get_nowait()
 

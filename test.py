@@ -26,3 +26,8 @@
 # for packet in page.listen.steps():
 #     packet.request.postData.update({'username': 'nguyenvantat123332'})
 #     print(packet.request.postData)
+
+
+with open('signup_links.txt', 'r+', encoding='utf-8') as file:
+    print(file.read())
+    file.truncate(0)
